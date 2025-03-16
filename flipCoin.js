@@ -2,24 +2,34 @@ const flipCoin = () => {
   return new Promise((resolve, reject) => {
     let result = Math.random();
     if (result > 0.5) {
-      resolve(
-        "You seem to have luck on your side today! Here's some advice to make the most of it..."
-      );
+      resolve("You won the coin flip! Let's get some advice...");
     } else {
-      reject("Not your lucky day, but don't worry—tomorrow is a new chance!");
+      reject("You lost the coin flip. No advice for you today!");
     }
   });
 };
 
-flipCoin()
-  .then((message) => {
-    console.log(message);
-    return fetch("https://api.adviceslip.com/advice");
-  })
-  .then((response) => response.json())
-  .then((data) => {
-    console.log("Today's advice:", data.slip.advice);
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+const getAdviceAfterCoinFlip = async () => {
+  try {
+    const result = await flipCoin();
+    console.log(result);
+
+    const response = await fetch("https://api.adviceslip.com/advice");
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.slip) {
+      throw new Error("Invalid response format from API");
+    }
+
+    console.log("Advice:", data.slip.advice);
+  } catch (error) {
+    console.log("Error:", error);
+  }
+};
+
+getAdviceAfterCoinFlip();
